@@ -1,11 +1,12 @@
 package com.pks.sgenerator.generator;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
@@ -20,21 +21,7 @@ import com.pks.sgenerator.page.PageBuilder;
 
 public class SGenUtil {
 
-//	private static final String SAVEPATH = "F:/code_temp/";
-//
-//	private static final String DATABASETYPE = Database.TYPE_MYSQL;// MySQL、SqlServer
-//
-//	private static final String ENTITYPACKAGENAME = "com.ks.entity.user";
-
-//	@Test
-//	public void test1() {
-//		Set<Class<?>> classesSet = UtilClass.getClasses(ENTITYPACKAGENAME);
-//		Class<?>[] test = new Class<?>[classesSet.size()];
-//		Class<?>[] carray = (Class<?>[]) classesSet.toArray(test);
-//		allJavaAndFtl(carray);
-//		allTable(carray);
-//	}
-	
+	@SuppressWarnings("resource")
 	public static void init(){
 		ApplicationContext context = new FileSystemXmlApplicationContext(SGenUtil.class.getResource("").getPath()+"gen_application.xml");
 		if (context != null) {
@@ -52,15 +39,6 @@ public class SGenUtil {
 	}
 	
 	public static FreeMarkerConfigurer freemarkerConfig = null;
-
-//	@BeforeClass
-//	public static void init() {
-////		 new ClassPathXmlApplicationContext("/resources/application.xml");
-//		ApplicationContext context = new FileSystemXmlApplicationContext(SGenUtil.class.getResource("").getPath()+"gen_application.xml");
-//		if (context != null) {
-//			freemarkerConfig = (MyFreeMarkerConfigurer) context.getBean("freemarkerConfig");
-//		}
-//	}
 
 	private static void allTable(String savepath,String databasetype,Class<?>[] carray) {
 		Database database = DatabaseBuilder.initDatabase(carray, databasetype);

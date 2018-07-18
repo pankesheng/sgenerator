@@ -26,6 +26,5 @@ public @interface DBField {
 	String  Default() default "";
 	/**数据库字段备注*/
 	String comment() default "";
-	
 }
 

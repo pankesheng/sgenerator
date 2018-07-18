@@ -8,29 +8,25 @@ import com.pks.sgenerator.java.query.QueryBuilder;
 
 public class JavaCodeBuilder {
 
-	public static JavaCode initJavaCode(Class<?> c) {
-		String name = c.getName();
-		String[] allName = name.split("\\.");
-		if (allName.length <2) {
+	public static JavaCode initJavaCode(Class<?> className) {
+		String[] allName = className.getName().split("\\.");
+		if (allName.length != 6) {// com.thanone.pm2.entity.us.User
 			return null;
 		}
 		JavaCode code = new JavaCode();
-		String packageName = name.substring(0,name.lastIndexOf("."));
-		code.setPackageName(packageName);
-		code.setModuleName(packageName.endsWith(".entity")?"":packageName.substring(packageName.lastIndexOf(".")+1));// us
-		String className = name.substring(name.lastIndexOf(".")+1);
-		code.setClassName(className);
-		String tableName = "t_" + className.toLowerCase();
-		if(c.isAnnotationPresent(DBTable.class)){
-			DBTable dbTable = c.getAnnotation(DBTable.class);
+		code.setPackageName(allName[0] + "." + allName[1] + "." + allName[2]);// com.thanone.pm2
+		code.setModuleName(allName[4]);// us
+		code.setClassName(allName[5]);// User
+		code.setTableName("t_" + allName[5].toLowerCase());// t_user
+		if(className.isAnnotationPresent(DBTable.class)){
+			DBTable dbTable = className.getAnnotation(DBTable.class);
 			if(StringUtils.isNotBlank(dbTable.name())){
-				tableName = dbTable.name();
+				code.setTableName(dbTable.name());
 			}
 		}
-		code.setTableName(tableName);
-		code.setFieldList(CoderUtil.allField(c, true));
-		code.setAllFieldList(CoderUtil.allField(c, false));
-		code.setQbuilderList(QueryBuilder.initQueryColumnList(c));
+		code.setFieldList(CoderUtil.allField(className, true));
+		code.setAllFieldList(CoderUtil.allField(className, false));
+		code.setQbuilderList(QueryBuilder.initQueryColumnList(className));
 		return code;
 	}
 
