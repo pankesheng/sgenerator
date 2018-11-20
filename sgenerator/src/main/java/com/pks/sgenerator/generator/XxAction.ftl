@@ -1,9 +1,10 @@
 package ${packages}.action.${modules};
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -13,7 +14,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import ${packages}.common.ZwPageResult;
@@ -46,30 +46,36 @@ public class ${classes}Action extends BasicAction {
 			<#if q.listQuery>
 				<#if q.oper == "=">
 					<#if q.fieldType == "String">
-		if (UtilString.isNotBlank(search${q.fieldName?cap_first})) {
-			qbuilder.put("${q.fieldName}", search${q.fieldName?cap_first});
-		}
+						if (UtilString.isNotBlank(search${q.fieldName?cap_first})) {
+							qbuilder.put("${q.fieldName}", search${q.fieldName?cap_first});
+						}
 					<#else>
-		if (search${q.fieldName?cap_first} != null) {
-			qbuilder.put("${q.fieldName}", search${q.fieldName?cap_first});
-		}
+						if (search${q.fieldName?cap_first} != null) {
+							qbuilder.put("${q.fieldName}", search${q.fieldName?cap_first});
+						}
 					</#if>
 				<#elseif q.oper == "like">
-		if (UtilString.isNotBlank(search${q.fieldName?cap_first})) {
-			qbuilder.put("${q.fieldName}", "%" + search${q.fieldName?cap_first} + "%");
-		}
+					if (UtilString.isNotBlank(search${q.fieldName?cap_first})) {
+						qbuilder.put("${q.fieldName}", "%" + search${q.fieldName?cap_first} + "%");
+					}
 				<#elseif q.oper == "time" || q.oper == "between">
-		if (search${q.fieldName?cap_first}Begin != null) {
-			qbuilder.put("${q.fieldName}Begin", search${q.fieldName?cap_first}Begin);
-		}
-		if (search${q.fieldName?cap_first}End != null) {
-			qbuilder.put("${q.fieldName}End", search${q.fieldName?cap_first}End);
-		}
+					if (search${q.fieldName?cap_first}Begin != null) {
+						qbuilder.put("${q.fieldName}Begin", search${q.fieldName?cap_first}Begin);
+					}
+					if (search${q.fieldName?cap_first}End != null) {
+						qbuilder.put("${q.fieldName}End", search${q.fieldName?cap_first}End);
+					}
 				</#if>
 			</#if>
 		</#list>
-		page.setRows(${classes?uncap_first}Service.findByPage(null, qbuilder));
-		page.setTotal(${classes?uncap_first}Service.getTotalRows(qbuilder));
+		List<${classes}> list = new ArrayList<${classes}>();
+		int total = 0;
+		total = ${classes?uncap_first}Service.getTotalRows(qbuilder);
+		if(total > 0 ){
+			list = ${classes?uncap_first}Service.findByPage(null, qbuilder);
+		}
+		page.setRows(list);
+		page.setTotal(total);
 		out.write(ZwPageResult.converByServiceResult(ServiceResult.initSuccess(page)));
 	}
 
