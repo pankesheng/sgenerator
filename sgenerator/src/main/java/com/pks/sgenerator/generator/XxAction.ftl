@@ -100,8 +100,16 @@ public class ${classes}Action extends BasicAction {
 			out.write(ServiceResult.initErrorJson("请选择需要删除的记录！"));
 			return;
 		}
+		if(!ids.matches("^[0-9]+(,[0-9]+)*$")){
+			out.write(ServiceResult.initErrorParamJson());
+			return ;
+		}
 		Long[] s = UtilConvert.string2Long(ids.split(","));
-		${classes?uncap_first}Service.deleteByIds(Arrays.asList(s));
+		if(s.length == 1){
+			${classes?uncap_first}Service.delete(s[0]);
+		}else{
+			${classes?uncap_first}Service.deleteByIds(Arrays.asList(s));
+		}
 		out.write(ServiceResult.initSuccessJson(null));
 	}
 	
@@ -123,6 +131,20 @@ public class ${classes}Action extends BasicAction {
 			${classes?uncap_first}Service.update(obj);
 		}
 		out.write(ServiceResult.initSuccessJson("操作成功！"));
+	}
+
+	@RequestMapping("/findInfo")
+	public void findInfo(HttpServletRequest request, Long id, PrintWriter out) {
+		if(id==null){
+			out.write(ServiceResult.initErrorParamJson());
+			return ;
+		}
+		${classes} obj = ${classes?uncap_first}Service.findById(id);
+		if(obj==null){
+			out.write(ServiceResult.initErrorJson("信息不存在！"));
+			return ;
+		}
+		out.write(ServiceResult.initSuccessJson(obj));
 	}
 
 }
