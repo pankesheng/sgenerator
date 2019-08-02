@@ -97,7 +97,7 @@ public class DatabaseBuilder {
 				return new String[] { "varchar", "100" };
 			} else if ("class java.util.Date".equals(ff.getType().toString())) {
 				return new String[] { "datetime", null };
-			} else if ("class java.lang.Float".equals(ff.getType().toString())) {
+			} else if ("class java.lang.Float".equals(ff.getType().toString()) || "class java.lang.Double".equals(ff.getType().toString())) {
 				return new String[] { "float", null };
 			} else if ("class java.math.BigDecimal".equals(ff.getType().toString())) {
 				return new String[] { "decimal(10,2)", null };

@@ -13,7 +13,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import ${packages}.common.ZwPageResult;
@@ -33,12 +32,7 @@ public class ${classes}Action extends BasicAction {
 	@Resource
 	private ${classes}Service ${classes?uncap_first}Service;
 
-	@RequestMapping("/tolist")
-	public String tolist(Model model) {
-
-		return "/WEB-INF/ftl/admin/${modules?lower_case}/${classes?lower_case}_list.ftl";
-	}
-
+	//列表查询
 	@RequestMapping("/list")
 	public void list(<#list qbuilderList as q><#if q.listQuery><#if q.oper == "=" || q.oper == "like">${q.fieldType} search${q.fieldName?cap_first}, <#elseif q.oper == "time" || q.oper == "between">${q.fieldType} search${q.fieldName?cap_first}Begin, ${q.fieldType} search${q.fieldName?cap_first}End, </#if></#if></#list>PrintWriter out) {
 		Map<String, Object> qbuilder = new HashMap<String, Object>();
@@ -79,21 +73,7 @@ public class ${classes}Action extends BasicAction {
 		out.write(ZwPageResult.converByServiceResult(ServiceResult.initSuccess(page)));
 	}
 
-	@RequestMapping("/toadd")
-	public String toadd(Model model) {
-		return "/WEB-INF/ftl/admin/${modules?lower_case}/${classes?lower_case}_modify.ftl";
-	}
-
-	@RequestMapping("/tomodify")
-	public String tomodify(Long id, Model model) {
-		${classes} obj = null;
-		if(id!=null){
-			obj = ${classes?uncap_first}Service.findById(id);
-		}
-		model.addAttribute("obj", obj);
-		return "/WEB-INF/ftl/admin/${modules?lower_case}/${classes?lower_case}_modify.ftl";
-	}
-
+	//删除记录
 	@RequestMapping("/delete")
 	public void delete(HttpServletRequest request, String ids, PrintWriter out) {
 		if (UtilString.isBlank(ids)) {
@@ -113,6 +93,7 @@ public class ${classes}Action extends BasicAction {
 		out.write(ServiceResult.initSuccessJson(null));
 	}
 	
+	//新增和修改
 	@RequestMapping("/modify")
 	public void modify(HttpServletRequest request, Long id, ${classes} obj, PrintWriter out) {
 		if (obj == null) {
@@ -133,6 +114,7 @@ public class ${classes}Action extends BasicAction {
 		out.write(ServiceResult.initSuccessJson("操作成功！"));
 	}
 
+	//根据编号获取对象详细信息
 	@RequestMapping("/findInfo")
 	public void findInfo(HttpServletRequest request, Long id, PrintWriter out) {
 		if(id==null){

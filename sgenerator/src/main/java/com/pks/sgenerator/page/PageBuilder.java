@@ -43,18 +43,18 @@ public class PageBuilder {
 	}
 
 	public static PageBean initPage(Class<?> c) {
-		if (c.isAnnotationPresent(PageType.class)) {
+//		if (c.isAnnotationPresent(PageType.class)) {
 			PageBean p = new PageBean();
 
-			PageType pageType = c.getAnnotation(PageType.class);
-			p.setPname(pageType.pname());
-			p.setName(pageType.name());
+//			PageType pageType = c.getAnnotation(PageType.class);
+//			p.setPname(pageType.pname());
+//			p.setName(pageType.name());
 			p.setClassName(c.getSimpleName());
 			p.setModuleName(c.getName().split("\\.")[4]);
-			p.setDialog(pageType.dialog());
-			p.setUeditor(pageType.ueditor());
-			p.setUpload(pageType.upload());
-			p.setExport(pageType.export());
+//			p.setDialog(pageType.dialog());
+//			p.setUeditor(pageType.ueditor());
+//			p.setUpload(pageType.upload());
+//			p.setExport(pageType.export());
 
 			List<PageColumnBean> columnList = new ArrayList<PageColumnBean>();
 			List<Field> fs = CoderUtil.allField(c, false);
@@ -90,7 +90,7 @@ public class PageBuilder {
 					b.setSearch(ct.search());
 					columnList.add(b);
 				}
-			}
+//			}
 			p.setColumnList(columnList);
 			return p;
 		}

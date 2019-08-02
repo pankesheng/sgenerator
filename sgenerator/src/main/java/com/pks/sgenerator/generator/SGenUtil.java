@@ -33,6 +33,18 @@ public class SGenUtil {
 		Class<?>[] carray = (Class<?>[]) classesSet.toArray(test);
 		allJavaAndFtl(savepath,databasetype,carray);
 		allTable(savepath,databasetype,carray);
+		System.out.println("文件生成结束！");
+	}
+	
+	public static void GenMySqlFile(String savepath,String entitypackage){
+		String databasetype = Database.TYPE_MYSQL;
+		init();
+		Set<Class<?>> classesSet = UtilClass.getClasses(entitypackage);
+		Class<?>[] test = new Class<?>[classesSet.size()];
+		Class<?>[] carray = (Class<?>[]) classesSet.toArray(test);
+		allJavaAndFtl(savepath,databasetype,carray);
+		allTable(savepath,databasetype,carray);
+		System.out.println("文件生成结束！");
 	}
 	
 	public static FreeMarkerConfigurer freemarkerConfig = null;
@@ -70,7 +82,7 @@ public class SGenUtil {
 							+ "_list.ftl");
 			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(
 					root,
-					SGenUtil.class.getResource("").getPath()+"Page_xx_modify.ftl",
+					SGenUtil.class.getResource("").getPath()+"Page_xx_modify2.ftl",
 					savepath + "/WEB-INF/ftl/admin/" + obj.getModuleName().toLowerCase() + "/" + obj.getClassName().toLowerCase()
 							+ "_modify.ftl");
 		}

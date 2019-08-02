@@ -30,9 +30,6 @@
 	</#if>
 </head>
 <body>
-<#if obj.dialog>
-		<div class="form-wrap">
-<#else>
 <div class="place">
     <span class="label-span">位置：</span>
     <ul id="place-list" class="place-ul">
@@ -46,7 +43,6 @@
             <span class="title-text">${(obj.name)!}</span>
         </div>
         <div class="panel-body">
-</#if>
 		    <form id="saveform" method="post">
 		    	<input type="hidden" name="id" value="${r"$"}{(obj.id)!}"/>
 		        <table class="form-table">
@@ -121,6 +117,42 @@
 			        		</#if>
 			        	</#if>
 		        	</#list>
+		        	
+		        	<tr>
+		                <td><label class="form-label"><b class="red">*</b></label></td>
+		                <td>
+		                	<input class="form-control" name="" type="text" />
+		                </td>
+		            </tr>
+			        <tr class="valign-top">
+						<td><label class="form-label"><b class="red">*</b></label></td>
+						<td>
+							<textarea class="form-textarea" name="" ></textarea>
+						</td>
+					</tr>
+			        <tr>
+		                <td><label class="form-label"><b class="red">*</b></label></td>
+		                <td>
+		                    <select class="form-select" name="" >
+		                    	<option value="">--请选择--</option>
+		                    </select>
+		                </td>
+		            </tr>
+			        <tr>
+		                <td><label class="form-label"><b class="red">*</b></label></td>
+		                <td>
+		                    <input class="form-control date" id="" name="" type="text" />
+		                </td>
+		            </tr>
+					<tr>
+		                <td><label class="form-label"><b class="red">*</b></label></td>
+		                <td>
+		                	<input type="hidden" name="">
+							<div id="addOrModify_imgs_"></div>
+							<input id="upload_" type="file"/>
+		                </td>
+		            </tr>
+		        	
 		            <tr>
 		                <td><label class="form-label">&nbsp;</label></td>
 		                <td>
