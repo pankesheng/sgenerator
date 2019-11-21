@@ -57,6 +57,7 @@
 		                <td><label class="form-label">${c.name}<#if c.must><b class="red">*</b></#if></label></td>
 		                <td>
 		                	<input class="form-control" name="${c.fieldName}" type="text" <#if (c.check)?? || c.must>data-check="<#if c.must>must<#if (c.check)??>|</#if></#if>${(c.check)!}"</#if> <#if (c.maxlength)??>maxlength="${c.maxlength}"</#if> value="${r"$"}{(obj.${c.fieldName})!<#if (c.defaultValue)??>'${c.defaultValue}'</#if>}"/>
+		                    <span class="form-tip alert alert-info">说明文字</span>
 		                </td>
 		            </tr>
 			        		<#elseif c.type = "textarea">
@@ -64,6 +65,7 @@
 						<td><label class="form-label">${c.name}<#if c.must><b class="red">*</b></#if></label></td>
 						<td>
 							<textarea class="form-textarea" name="${c.fieldName}" <#if (c.check)?? || c.must>data-check="<#if c.must>must<#if (c.check)??>|</#if></#if>${(c.check)!}"</#if> >${r"$"}{(obj.${c.fieldName})!<#if (c.defaultValue)??>'${c.defaultValue}'</#if>}</textarea>
+						    <span class="form-tip alert alert-info">说明文字</span>
 						</td>
 					</tr>
 			        		<#elseif c.type = "select">
@@ -85,6 +87,7 @@
 		                        <option value="${newKey}" <${r"#if"} (obj.${c.fieldName})?? && obj.${c.fieldName}=="${newKey}">selected<${r"/#if"}>>${newValue}</option>
 		                        </#list>
 		                    </select>
+		                    <span class="form-tip alert alert-info">说明文字</span>
 		                </td>
 		            </tr>
 		            		<#elseif c.type = "date">
@@ -92,6 +95,7 @@
 		                <td><label class="form-label">${c.name}<#if c.must><b class="red">*</b></#if></label></td>
 		                <td>
 		                    <input class="form-control date" id="${c.fieldName}" name="${c.fieldName}" type="text" <#if (c.check)?? || c.must>data-check="<#if c.must>must<#if (c.check)??>|</#if></#if>${(c.check)!}"</#if> value="${r"$"}{((obj.${c.fieldName})?string("yyyy-MM-dd HH:mm:ss"))!<#if (c.defaultValue)??>'${c.defaultValue}'</#if>}"/>
+		                    <span class="form-tip alert alert-info">说明文字</span>
 		                </td>
 		            </tr>
 			        		<#elseif c.type = "img">
@@ -101,6 +105,7 @@
 		                	<input type="hidden" name="${c.fieldName}">
 							<div id="addOrModify_imgs_${c.fieldName}"></div>
 							<input id="upload_${c.fieldName}" type="file"/>
+							<span class="form-tip alert alert-info">说明文字</span>
 		                </td>
 		            </tr>
 		            		<#elseif c.type = "file">
@@ -109,6 +114,7 @@
 		                <td>
 		                	<input class="form-control" id="${c.fieldName}" name="${c.fieldName}" type="text" <#if (c.check)?? || c.must>data-check="<#if c.must>must<#if (c.check)??>|</#if></#if>${(c.check)!}"</#if> value="${r"$"}{(obj.${c.fieldName})!}" readonly="readonly">
 							<input id="upload_${c.fieldName}" type="file"/>
+							<span class="form-tip alert alert-info">说明文字</span>
 		                </td>
 		            </tr>
 			        		<#elseif c.type = "ueditor">
@@ -116,6 +122,7 @@
 						<td><label class="form-label">${c.name}<#if c.must><b class="red">*</b></#if></label></td>
 						<td>
 							<script id="editor_${c.fieldName}" name="${c.fieldName}" type="text/plain" style="width:800px;height:300px;"><${r"#noescape"}>${r"$"}{(obj.${c.fieldName})!<#if (c.defaultValue)??>'${c.defaultValue}'</#if>}<${r"/#noescape"}></script>
+						    <span class="form-tip alert alert-info">说明文字</span>
 						</td>
 					</tr>		
 			        		</#if>

@@ -5,7 +5,7 @@
 	<link rel="stylesheet" href="${r"$"}{contextPath}/admin/stylesheets/common.css?v=${r"$"}{sversion}" />
     <link rel="stylesheet" href="${r"$"}{contextPath}/admin/stylesheets/table.css?v=${r"$"}{sversion}" />
 	<script type="text/javascript" src="${r"$"}{contextPath}/ext/jquery/jquery-1.8.1.min.js"></script>
-    <script type="text/javascript" src="${r"$"}{contextPath}/admin/ext/layer_v2/layer.js"></script>
+    <script type="text/javascript" src="${r"$"}{contextPath}/ext/layer/layer.min.js"></script>
     <script type="text/javascript" src="${r"$"}{contextPath}/ext/laydate/laydate.js"></script>
     <script type="text/javascript" src="${r"$"}{contextPath}/admin/ext/jquery/selectbox.js"></script>
     <script type="text/javascript" src="${r"$"}{contextPath}/admin/ext/zw/grid.js?v=${r"$"}{sversion}"></script>
@@ -136,16 +136,7 @@
     //添加
 	function add(){
 		<#if obj.dialog>
-		var url = '${r"$"}{contextPath}/${obj.className?uncap_first}/toadd.do';
-        layer.open({
-             type: 2,
-                title: null,
-                shadeClose: false,
-                closeBtn:0,
-                maxmin: false, //开启最大化最小化按钮
-                area: ['100%', '100%'],
-                content: url
-        });
+		z_openIframe('新增', 700, 400, '${r"$"}{contextPath}/${obj.className?uncap_first}/toadd.do');
 		<#else>		
 		window.location.href = '${r"$"}{contextPath}/${obj.className?uncap_first}/toadd.do';
 		</#if>
@@ -154,16 +145,7 @@
 	//编辑
 	function editItem(id){
 		<#if obj.dialog>
-		var url = '${r"$"}{contextPath}/${obj.className?uncap_first}/tomodify.do?id=' + id;
-        layer.open({
-             type: 2,
-                title: null,
-                shadeClose: false,
-                closeBtn:0,
-                maxmin: false, //开启最大化最小化按钮
-                area: ['100%', '100%'],
-                content: url
-        });
+		z_openIframe('编辑', 700, 400, '${r"$"}{contextPath}/${obj.className?uncap_first}/tomodify/' + id + '.do');
 		<#else>
 		window.location.href = '${r"$"}{contextPath}/${obj.className?uncap_first}/tomodify/' + id + '.do';
 		</#if>

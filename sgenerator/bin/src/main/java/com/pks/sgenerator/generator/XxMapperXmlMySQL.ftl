@@ -32,8 +32,7 @@
 	</sql>
 	
 	<select id="find" resultType="${classes}">
-		SELECT ${tables}.`id`,<#list fields as f>${tables}.`${f.name}`,</#list>${tables}.`ctime`,${tables}.`utime` 
-		FROM ${tables}
+		SELECT * FROM ${tables}
 		<if test="qbuilder != null">
 			<include refid="qbuilder"/>
 		</if>
@@ -56,8 +55,7 @@
 	</select>
 	
 	<select id="getTotalRows" resultType="int">
-		SELECT COUNT(${tables}.id) 
-		FROM ${tables}
+		SELECT COUNT(${tables}.id) FROM ${tables}
 		<if test="qbuilder != null">
 			<include refid="qbuilder"/>
 		</if>

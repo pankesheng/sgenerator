@@ -30,6 +30,9 @@
 	</#if>
 </head>
 <body>
+<#if obj.dialog>
+		<div class="form-wrap">
+<#else>
 <div class="place">
     <span class="label-span">位置：</span>
     <ul id="place-list" class="place-ul">
@@ -43,6 +46,7 @@
             <span class="title-text">${(obj.name)!}</span>
         </div>
         <div class="panel-body">
+</#if>
 		    <form id="saveform" method="post">
 		    	<input type="hidden" name="id" value="${r"$"}{(obj.id)!}"/>
 		        <table class="form-table">
@@ -53,7 +57,6 @@
 		                <td><label class="form-label">${c.name}<#if c.must><b class="red">*</b></#if></label></td>
 		                <td>
 		                	<input class="form-control" name="${c.fieldName}" type="text" <#if (c.check)?? || c.must>data-check="<#if c.must>must<#if (c.check)??>|</#if></#if>${(c.check)!}"</#if> <#if (c.maxlength)??>maxlength="${c.maxlength}"</#if> value="${r"$"}{(obj.${c.fieldName})!<#if (c.defaultValue)??>'${c.defaultValue}'</#if>}"/>
-		                    <span class="form-tip alert alert-info">说明文字</span>
 		                </td>
 		            </tr>
 			        		<#elseif c.type = "textarea">
@@ -61,7 +64,6 @@
 						<td><label class="form-label">${c.name}<#if c.must><b class="red">*</b></#if></label></td>
 						<td>
 							<textarea class="form-textarea" name="${c.fieldName}" <#if (c.check)?? || c.must>data-check="<#if c.must>must<#if (c.check)??>|</#if></#if>${(c.check)!}"</#if> >${r"$"}{(obj.${c.fieldName})!<#if (c.defaultValue)??>'${c.defaultValue}'</#if>}</textarea>
-						    <span class="form-tip alert alert-info">说明文字</span>
 						</td>
 					</tr>
 			        		<#elseif c.type = "select">
@@ -83,7 +85,6 @@
 		                        <option value="${newKey}" <${r"#if"} (obj.${c.fieldName})?? && obj.${c.fieldName}=="${newKey}">selected<${r"/#if"}>>${newValue}</option>
 		                        </#list>
 		                    </select>
-		                    <span class="form-tip alert alert-info">说明文字</span>
 		                </td>
 		            </tr>
 		            		<#elseif c.type = "date">
@@ -91,7 +92,6 @@
 		                <td><label class="form-label">${c.name}<#if c.must><b class="red">*</b></#if></label></td>
 		                <td>
 		                    <input class="form-control date" id="${c.fieldName}" name="${c.fieldName}" type="text" <#if (c.check)?? || c.must>data-check="<#if c.must>must<#if (c.check)??>|</#if></#if>${(c.check)!}"</#if> value="${r"$"}{((obj.${c.fieldName})?string("yyyy-MM-dd HH:mm:ss"))!<#if (c.defaultValue)??>'${c.defaultValue}'</#if>}"/>
-		                    <span class="form-tip alert alert-info">说明文字</span>
 		                </td>
 		            </tr>
 			        		<#elseif c.type = "img">
@@ -101,7 +101,6 @@
 		                	<input type="hidden" name="${c.fieldName}">
 							<div id="addOrModify_imgs_${c.fieldName}"></div>
 							<input id="upload_${c.fieldName}" type="file"/>
-							<span class="form-tip alert alert-info">说明文字</span>
 		                </td>
 		            </tr>
 		            		<#elseif c.type = "file">
@@ -110,7 +109,6 @@
 		                <td>
 		                	<input class="form-control" id="${c.fieldName}" name="${c.fieldName}" type="text" <#if (c.check)?? || c.must>data-check="<#if c.must>must<#if (c.check)??>|</#if></#if>${(c.check)!}"</#if> value="${r"$"}{(obj.${c.fieldName})!}" readonly="readonly">
 							<input id="upload_${c.fieldName}" type="file"/>
-							<span class="form-tip alert alert-info">说明文字</span>
 		                </td>
 		            </tr>
 			        		<#elseif c.type = "ueditor">
@@ -118,48 +116,11 @@
 						<td><label class="form-label">${c.name}<#if c.must><b class="red">*</b></#if></label></td>
 						<td>
 							<script id="editor_${c.fieldName}" name="${c.fieldName}" type="text/plain" style="width:800px;height:300px;"><${r"#noescape"}>${r"$"}{(obj.${c.fieldName})!<#if (c.defaultValue)??>'${c.defaultValue}'</#if>}<${r"/#noescape"}></script>
-						    <span class="form-tip alert alert-info">说明文字</span>
 						</td>
 					</tr>		
 			        		</#if>
 			        	</#if>
 		        	</#list>
-		        	
-		        	<tr>
-		                <td><label class="form-label"><b class="red">*</b></label></td>
-		                <td>
-		                	<input class="form-control" name="" type="text" />
-		                </td>
-		            </tr>
-			        <tr class="valign-top">
-						<td><label class="form-label"><b class="red">*</b></label></td>
-						<td>
-							<textarea class="form-textarea" name="" ></textarea>
-						</td>
-					</tr>
-			        <tr>
-		                <td><label class="form-label"><b class="red">*</b></label></td>
-		                <td>
-		                    <select class="form-select" name="" >
-		                    	<option value="">--请选择--</option>
-		                    </select>
-		                </td>
-		            </tr>
-			        <tr>
-		                <td><label class="form-label"><b class="red">*</b></label></td>
-		                <td>
-		                    <input class="form-control date" id="" name="" type="text" />
-		                </td>
-		            </tr>
-					<tr>
-		                <td><label class="form-label"><b class="red">*</b></label></td>
-		                <td>
-		                	<input type="hidden" name="">
-							<div id="addOrModify_imgs_"></div>
-							<input id="upload_" type="file"/>
-		                </td>
-		            </tr>
-		        	
 		            <tr>
 		                <td><label class="form-label">&nbsp;</label></td>
 		                <td>
@@ -217,33 +178,48 @@ function _save() {
 		</#if>
 	</#list>
 	
-	var url = '${r"$"}{contextPath}/${obj.className?uncap_first}/modify.ajax' ;
-	if($('#saveform').check()){
-		<#list obj.columnList as c>
-			<#if c.modify && c.must>
-				<#if c.type = "img">
-		if($("input[name='${c.fieldName}']").val()=="") {
-			alert("请上传${c.name}");
-			return false;
-		}
-				<#elseif c.type = "">
-		if(ue_${c.fieldName}.getContent()=="") {
-			alert("请填写${c.name}");
-			return false;
-		}
-				</#if>
-			</#if>
-		</#list>
-		var post = $('#saveform').serialize();
-		if(!confirm("确定提交？")) return false;
-		$.post(url,post,function(data){
-			if(1==data.s){
-				alert(data.d||"操作成功");
-			}else{
-				alert(data.d||"操作失败");
+	$("#saveform").ajaxSubmit({
+		url : '${r"$"}{contextPath}/${obj.className?uncap_first}/modify.ajax',
+		dataType : 'json',
+		beforeSubmit : function(formData, jqForm, options) {
+			if(!$("#saveform").check())return false;
+
+			<#list obj.columnList as c>
+				<#if c.modify && c.must>
+					<#if c.type = "img">
+			if($("input[name='${c.fieldName}']").val()=="") {
+				alert("请上传${c.name}");
+				return false;
 			}
-		},"json");
-	}
+					<#elseif c.type = "">
+			if(ue_${c.fieldName}.getContent()=="") {
+				alert("请填写${c.name}");
+				return false;
+			}
+					</#if>
+				</#if>
+			</#list>
+
+			if(!window.confirm("确定提交?"))return false;
+		    return true;
+		},
+		success : function(data, statusText, xhr) {
+			if(data.s){
+				<#if obj.dialog>
+				window.parent.grid.refresh();
+				// 解决IE6下关闭弹窗时焦点丢失的问题
+				$("#searchKey", window.parent.document).focus();
+				window.parent.layer.closeAll();
+				<#else>
+				z_alert_success(data.d||"操作成功！");
+				_back();
+				</#if>
+			}else{
+				z_alert_error(data.d);
+			}
+		    return true;
+		}
+	});
 }
 <#if !(obj.dialog)>
 function _back() {
