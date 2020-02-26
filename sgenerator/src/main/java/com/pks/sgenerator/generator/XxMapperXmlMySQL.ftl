@@ -32,7 +32,7 @@
 	</sql>
 	
 	<select id="find" resultType="${classes}">
-		SELECT ${tables}.`id`,<#list fields as f>${tables}.`${f.name}`,</#list>${tables}.`ctime`,${tables}.`utime` 
+		SELECT *
 		FROM ${tables}
 		<if test="qbuilder != null">
 			<include refid="qbuilder"/>
@@ -107,5 +107,13 @@
 	<delete id="cleanTable">
 		DELETE FROM ${tables}
 	</delete>
+	
+	<select id="selectExists" resultType="Integer" >
+        select 1 from ${tables} 
+        <if test="qbuilder != null">
+            <include refid="qbuilder"/>
+        </if>
+         limit 1
+    </select>
 
 </mapper>

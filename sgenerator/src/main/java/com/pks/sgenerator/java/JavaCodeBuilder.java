@@ -8,7 +8,7 @@ import com.pks.sgenerator.java.query.QueryBuilder;
 
 public class JavaCodeBuilder {
 
-	public static JavaCode initJavaCode(Class<?> className) {
+	public static JavaCode initJavaCode(Class<?> className,String prefix) {
 		String[] allName = className.getName().split("\\.");
 		if (allName.length != 6) {// com.thanone.pm2.entity.us.User
 			return null;
@@ -17,7 +17,11 @@ public class JavaCodeBuilder {
 		code.setPackageName(allName[0] + "." + allName[1] + "." + allName[2]);// com.thanone.pm2
 		code.setModuleName(allName[4]);// us
 		code.setClassName(allName[5]);// User
-		code.setTableName("t_" + allName[5].toLowerCase());// t_user
+		if(StringUtils.isNotBlank(prefix)){
+			code.setTableName("t_" + prefix + "_" + allName[5].toLowerCase());// t_user
+		}else{
+			code.setTableName("t_" + allName[5].toLowerCase());// t_user
+		}
 		if(className.isAnnotationPresent(DBTable.class)){
 			DBTable dbTable = className.getAnnotation(DBTable.class);
 			if(StringUtils.isNotBlank(dbTable.name())){

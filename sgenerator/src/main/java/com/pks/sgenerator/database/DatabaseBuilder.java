@@ -16,10 +16,10 @@ import com.pks.sgenerator.generator.DBField;
 
 public class DatabaseBuilder {
 
-	public static Database initDatabase(Class<?>[] carray, String databaseType) {
+	public static Database initDatabase(Class<?>[] carray, String databaseType,String prefix) {
 		List<Table> tables = new ArrayList<Table>();
 		for (Class<?> c : carray) {
-			tables.add(initTable(c, databaseType));
+			tables.add(initTable(c, databaseType,prefix));
 		}
 		String dname = carray[0].getName().split("\\.")[2];
 
@@ -29,8 +29,13 @@ public class DatabaseBuilder {
 		return result;
 	}
 
-	private static Table initTable(Class<?> c, String databaseType) {
-		String tableName = "t_" + c.getSimpleName().toLowerCase();
+	private static Table initTable(Class<?> c, String databaseType,String prefix) {
+		String tableName = "";
+		if(StringUtils.isNotBlank(prefix)){
+			tableName = "t_" + prefix + "_" + c.getSimpleName().toLowerCase();
+		}else{
+			tableName = "t_" + c.getSimpleName().toLowerCase();
+		}
 		List<TableColumn> columns = new ArrayList<TableColumn>();
 
 		List<Field> fs = CoderUtil.allField(c, true);

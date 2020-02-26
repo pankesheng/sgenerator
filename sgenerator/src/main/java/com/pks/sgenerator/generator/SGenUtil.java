@@ -31,8 +31,8 @@ public class SGenUtil {
 		Set<Class<?>> classesSet = UtilClass.getClasses(entitypackage);
 		Class<?>[] test = new Class<?>[classesSet.size()];
 		Class<?>[] carray = (Class<?>[]) classesSet.toArray(test);
-		allJavaAndFtl(savepath,databasetype,carray);
-		allTable(savepath,databasetype,carray);
+		allJavaAndFtl(savepath,databasetype,carray,null);
+		allTable(savepath,databasetype,carray,null);
 		System.out.println("文件生成结束！");
 	}
 	
@@ -42,15 +42,26 @@ public class SGenUtil {
 		Set<Class<?>> classesSet = UtilClass.getClasses(entitypackage);
 		Class<?>[] test = new Class<?>[classesSet.size()];
 		Class<?>[] carray = (Class<?>[]) classesSet.toArray(test);
-		allJavaAndFtl(savepath,databasetype,carray);
-		allTable(savepath,databasetype,carray);
+		allJavaAndFtl(savepath,databasetype,carray,null);
+		allTable(savepath,databasetype,carray,null);
+		System.out.println("文件生成结束！");
+	}
+	
+	public static void GenMySqlFile(String savepath,String entitypackage,String prefix){
+		String databasetype = Database.TYPE_MYSQL;
+		init();
+		Set<Class<?>> classesSet = UtilClass.getClasses(entitypackage);
+		Class<?>[] test = new Class<?>[classesSet.size()];
+		Class<?>[] carray = (Class<?>[]) classesSet.toArray(test);
+		allJavaAndFtl(savepath,databasetype,carray,prefix);
+		allTable(savepath,databasetype,carray,prefix);
 		System.out.println("文件生成结束！");
 	}
 	
 	public static FreeMarkerConfigurer freemarkerConfig = null;
 
-	private static void allTable(String savepath,String databasetype,Class<?>[] carray) {
-		Database database = DatabaseBuilder.initDatabase(carray, databasetype);
+	private static void allTable(String savepath,String databasetype,Class<?>[] carray,String prefix) {
+		Database database = DatabaseBuilder.initDatabase(carray, databasetype,prefix);
 		Map<String, Object> root = new HashMap<String, Object>();
 		root.put("tables", database.getTables());
 		root.put("databasename", database.getName());
@@ -63,9 +74,9 @@ public class SGenUtil {
 		}
 	}
 
-	private static void allJavaAndFtl(String savepath,String databasetype, Class<?>[] carray) {
+	private static void allJavaAndFtl(String savepath,String databasetype, Class<?>[] carray,String prefix) {
 		for (Class<?> c : carray) {
-			allJava(savepath,databasetype,c);
+			allJava(savepath,databasetype,c,prefix);
 			allFtl(savepath,c);
 		}
 	}
@@ -88,9 +99,9 @@ public class SGenUtil {
 		}
 	}
 
-	private static void allJava(String savepath, String databasetype, Class<?> className) {
+	private static void allJava(String savepath, String databasetype, Class<?> className,String prefix) {
 
-		JavaCode code = JavaCodeBuilder.initJavaCode(className);
+		JavaCode code = JavaCodeBuilder.initJavaCode(className,prefix);
 
 		Map<String, Object> root = new HashMap<String, Object>();
 		if (code != null) {
@@ -116,7 +127,7 @@ public class SGenUtil {
 					savepath + code.getPackageName() + "/service/" + code.getModuleName() + "/" + code.getClassName() + "Service.java");
 			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, SGenUtil.class.getResource("").getPath()+"XxServiceImpl.ftl",
 					savepath + code.getPackageName() + "/service/" + code.getModuleName() + "/" + code.getClassName() + "ServiceImpl.java");
-			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, SGenUtil.class.getResource("").getPath()+"XxAction.ftl",
+			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, SGenUtil.class.getResource("").getPath()+"XxAction2.ftl",
 					savepath + code.getPackageName() + "/action/" + code.getModuleName() + "/" + code.getClassName() + "Action.java");
 		} else {
 			System.out.println("生成 " + className.getName() + " 失败");
