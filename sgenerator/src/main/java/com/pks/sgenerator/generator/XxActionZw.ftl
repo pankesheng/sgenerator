@@ -101,7 +101,7 @@ public class ${classes}Action extends BasicAction {
 			return ;
 		}
 		if(id==null){
-			obj.setId(UtilString.getLongUUID());
+			obj.insertBefore();
 			${classes?uncap_first}Service.insert(obj);
 		}else{
 			${classes} update = ${classes?uncap_first}Service.findById(id);
