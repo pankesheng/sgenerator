@@ -4,15 +4,9 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-
-
-
-
-
 import org.apache.commons.lang3.StringUtils;
 
 import com.pks.sgenerator.coder.CoderUtil;
-import com.pks.sgenerator.generator.DBField;
 
 public class DatabaseBuilder {
 
@@ -75,8 +69,8 @@ public class DatabaseBuilder {
 	private static String[] initDefaultTypeAndLengthByField(String databaseType, Field ff) {
 		if (Database.TYPE_MYSQL.equals(databaseType)) {
 			if ("class java.lang.Integer".equals(ff.getType().toString())) {
-				if(ff.isAnnotationPresent(DBField.class)){
-					DBField f = ff.getAnnotation(DBField.class);
+				if(ff.isAnnotationPresent(TableColumnType.class)){
+					TableColumnType f = ff.getAnnotation(TableColumnType.class);
 					if(f.length()>0){
 						if(f.length()<=4){
 							return new String[]{"tinyint",""+f.length()+""};
@@ -89,8 +83,8 @@ public class DatabaseBuilder {
 			} else if ("class java.lang.Long".equals(ff.getType().toString())) {
 				return new String[] { "bigint", "20" };
 			} else if ("class java.lang.String".equals(ff.getType().toString())) {
-				if(ff.isAnnotationPresent(DBField.class)){
-					DBField f = ff.getAnnotation(DBField.class);
+				if(ff.isAnnotationPresent(TableColumnType.class)){
+					TableColumnType f = ff.getAnnotation(TableColumnType.class);
 					if("text".equals(f.type())){
 						return new String[]{"text",null};
 					}else if("longtext".equals(f.type())){
