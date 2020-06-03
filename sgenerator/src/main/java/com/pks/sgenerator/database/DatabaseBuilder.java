@@ -81,6 +81,12 @@ public class DatabaseBuilder {
 				}
 				return new String[] { "int", "11" };
 			} else if ("class java.lang.Long".equals(ff.getType().toString())) {
+				if(ff.isAnnotationPresent(TableColumnType.class)){
+					TableColumnType f = ff.getAnnotation(TableColumnType.class);
+					if(f.length()>20){
+						return new String[]{"bigint",""+f.length()+""};
+					}
+				}
 				return new String[] { "bigint", "20" };
 			} else if ("class java.lang.String".equals(ff.getType().toString())) {
 				if(ff.isAnnotationPresent(TableColumnType.class)){
@@ -96,7 +102,8 @@ public class DatabaseBuilder {
 				return new String[] { "varchar", "100" };
 			} else if ("class java.util.Date".equals(ff.getType().toString())) {
 				return new String[] { "datetime", null };
-			} else if ("class java.lang.Float".equals(ff.getType().toString()) || "class java.lang.Double".equals(ff.getType().toString())) {
+			} else if ("class java.lang.Float".equals(ff.getType().toString()) 
+					|| "class java.lang.Double".equals(ff.getType().toString())) {
 				return new String[] { "decimal(10,2)", null };
 			} else if ("class java.math.BigDecimal".equals(ff.getType().toString())) {
 				return new String[] { "decimal(10,2)", null };
@@ -107,16 +114,40 @@ public class DatabaseBuilder {
 			} else if ("class java.lang.Long".equals(ff.getType().toString())) {
 				return new String[] { "bigint", null };
 			} else if ("class java.lang.String".equals(ff.getType().toString())) {
+				if(ff.isAnnotationPresent(TableColumnType.class)){
+					TableColumnType f = ff.getAnnotation(TableColumnType.class);
+					if(f.length()>0){
+						return new String[]{"nvarchar",""+f.length()+""};
+					}
+				}
 				return new String[] { "nvarchar", "100" };
 			} else if ("class java.util.Date".equals(ff.getType().toString())) {
 				return new String[] { "datetime", null };
 			}
 		} else if (Database.TYPE_ORACLE.equals(databaseType)) {
 			if ("class java.lang.Integer".equals(ff.getType().toString())) {
+				if(ff.isAnnotationPresent(TableColumnType.class)){
+					TableColumnType f = ff.getAnnotation(TableColumnType.class);
+					if(f.length()>0){
+						return new String[]{"number",""+f.length()+""};
+					}
+				}
 				return new String[] { "number", "11" };
 			} else if ("class java.lang.Long".equals(ff.getType().toString())) {
+				if(ff.isAnnotationPresent(TableColumnType.class)){
+					TableColumnType f = ff.getAnnotation(TableColumnType.class);
+					if(f.length()>0){
+						return new String[]{"number",""+f.length()+""};
+					}
+				}
 				return new String[] { "number", "20" };
 			} else if ("class java.lang.String".equals(ff.getType().toString())) {
+				if(ff.isAnnotationPresent(TableColumnType.class)){
+					TableColumnType f = ff.getAnnotation(TableColumnType.class);
+					if(f.length()>0){
+						return new String[]{"nvarchar2",""+f.length()+""};
+					}
+				}
 				return new String[] { "nvarchar2", "100" };
 			} else if ("class java.util.Date".equals(ff.getType().toString())) {
 				return new String[] { "date", null };
