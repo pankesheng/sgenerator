@@ -35,4 +35,6 @@ public @interface TableColumnType {
 
 	/** 数据库字段备注 */
 	String comment() default "";
+	
+	String defaultValue() default "";
 }

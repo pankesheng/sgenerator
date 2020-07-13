@@ -40,6 +40,7 @@ public class DatabaseBuilder {
 			Boolean tNullable = true;
 			Boolean tIndex = false;
 			String tComment = null;
+			String defaultValue = null;
 			if (f.isAnnotationPresent(TableColumnType.class)) {
 				TableColumnType sqlType = f.getAnnotation(TableColumnType.class);
 				if (sqlType.length() != 0) {
@@ -60,8 +61,11 @@ public class DatabaseBuilder {
 						tLength = null;
 					}
 				}
+				if(StringUtils.isNotBlank(sqlType.defaultValue())){
+					defaultValue = sqlType.defaultValue();
+				}
 			}
-			columns.add(new TableColumn(f.getName(), tType, tLength, tNullable, tIndex, tComment));
+			columns.add(new TableColumn(f.getName(), tType, tLength, tNullable, tIndex, tComment,defaultValue));
 		}
 		return new Table(tableName, columns);
 	}
