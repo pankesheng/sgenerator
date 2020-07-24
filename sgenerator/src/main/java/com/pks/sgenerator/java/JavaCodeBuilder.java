@@ -17,11 +17,7 @@ public class JavaCodeBuilder {
 		code.setPackageName(allName[0] + "." + allName[1] + "." + allName[2]);// com.thanone.pm2
 		code.setModuleName(allName[4]);// us
 		code.setClassName(allName[5]);// User
-		if(StringUtils.isNotBlank(prefix)){
-			code.setTableName("t_" + prefix + "_" + allName[5].toLowerCase());// t_user
-		}else{
-			code.setTableName("t_" + allName[5].toLowerCase());// t_user
-		}
+		code.setTableName(convertTableName(prefix, allName[5]));
 		if(className.isAnnotationPresent(DBTable.class)){
 			DBTable dbTable = className.getAnnotation(DBTable.class);
 			if(StringUtils.isNotBlank(dbTable.name())){
@@ -32,6 +28,30 @@ public class JavaCodeBuilder {
 		code.setAllFieldList(CoderUtil.allField(className, false));
 		code.setQbuilderList(QueryBuilder.initQueryColumnList(className));
 		return code;
+	}
+	
+	public static String convertTableName(String prefix,String tableName){
+		
+		if(StringUtils.isNotBlank(prefix)){
+			return "t_" + prefix + "_" + tableName.toLowerCase();
+		}else{
+			return "t_" + tableName.toLowerCase();
+		}
+		
+//		StringBuilder sb = new StringBuilder();
+//		char[] charArray = tableName.toCharArray();
+//		for (char c : charArray) {
+//			if (c >= 'A' && c <= 'Z') {
+//				sb.append("_" + c);
+//			} else {
+//				sb.append(c);
+//			}
+//		}
+//		if(StringUtils.isNotBlank(prefix)){
+//			return "t_" + prefix + sb.toString().toLowerCase();
+//		}else{
+//			return "t" + sb.toString().toLowerCase();
+//		}
 	}
 
 }

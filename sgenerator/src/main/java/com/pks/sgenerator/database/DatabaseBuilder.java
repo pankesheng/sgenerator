@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.pks.sgenerator.coder.CoderUtil;
+import com.pks.sgenerator.java.JavaCodeBuilder;
 
 public class DatabaseBuilder {
 
@@ -25,11 +26,7 @@ public class DatabaseBuilder {
 
 	private static Table initTable(Class<?> c, String databaseType,String prefix) {
 		String tableName = "";
-		if(StringUtils.isNotBlank(prefix)){
-			tableName = "t_" + prefix + "_" + c.getSimpleName().toLowerCase();
-		}else{
-			tableName = "t_" + c.getSimpleName().toLowerCase();
-		}
+		tableName = JavaCodeBuilder.convertTableName(prefix, c.getSimpleName());
 		List<TableColumn> columns = new ArrayList<TableColumn>();
 
 		List<Field> fs = CoderUtil.allField(c, true);
