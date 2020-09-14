@@ -1,5 +1,9 @@
 package com.pks.sgenerator.generator;
 
+import java.io.DataOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -19,15 +23,50 @@ import com.pks.sgenerator.page.PageBuilder;
 public class SGenUtil {
 
 	@SuppressWarnings("resource")
-	public static void init(){
-		ApplicationContext context = new FileSystemXmlApplicationContext(SGenUtil.class.getResource("").getPath()+"gen_application.xml");
+	public static void init(String basePath){
+		DataOutputStream outputStream  = null;
+		InputStream inputStream = null;
+		try {
+			inputStream = SUtilGenDoc.class.getResourceAsStream("gen_application.xml");
+			outputStream = new DataOutputStream(new FileOutputStream(basePath + "gen_application.xml"));
+			int len = inputStream.available();
+			//判断长度是否大于1M
+			if (len <= 1024 * 1024) {
+				byte[] bytes = new byte[len];
+				inputStream.read(bytes);
+				outputStream.write(bytes);
+			} else {
+				int byteCount = 0;
+				//1M逐个读取
+				byte[] bytes = new byte[1024*1024];
+				while ((byteCount = inputStream.read(bytes)) != -1){
+					outputStream.write(bytes, 0, byteCount);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				outputStream.flush();
+				inputStream.close();
+				outputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		ApplicationContext context = new FileSystemXmlApplicationContext(basePath + "gen_application.xml");
 		if (context != null) {
 			freemarkerConfig = (MyFreeMarkerConfigurer) context.getBean("freemarkerConfig");
 		}
+//		ApplicationContext context = new FileSystemXmlApplicationContext(SGenUtil.class.getResource("").getPath()+"gen_application.xml");
+//		if (context != null) {
+//			freemarkerConfig = (MyFreeMarkerConfigurer) context.getBean("freemarkerConfig");
+//		}
 	}
 	
-	public static void GenFile(String savepath,String databasetype,String entitypackage){
-		init();
+	public static void GenFile(String basePath,String savepath,String databasetype,String entitypackage){
+		init(basePath);
 		Set<Class<?>> classesSet = UtilClass.getClasses(entitypackage);
 		Class<?>[] test = new Class<?>[classesSet.size()];
 		Class<?>[] carray = (Class<?>[]) classesSet.toArray(test);
@@ -36,9 +75,9 @@ public class SGenUtil {
 		System.out.println("文件生成结束！");
 	}
 	
-	public static void GenMySqlFile(String savepath,String entitypackage){
+	public static void GenMySqlFile(String basePath,String savepath,String entitypackage){
 		String databasetype = Database.TYPE_MYSQL;
-		init();
+		init(basePath);
 		Set<Class<?>> classesSet = UtilClass.getClasses(entitypackage);
 		Class<?>[] test = new Class<?>[classesSet.size()];
 		Class<?>[] carray = (Class<?>[]) classesSet.toArray(test);
@@ -47,9 +86,9 @@ public class SGenUtil {
 		System.out.println("文件生成结束！");
 	}
 	
-	public static void GenMySqlFile(String savepath,String entitypackage,String prefix){
+	public static void GenMySqlFile(String basePath,String savepath,String entitypackage,String prefix){
 		String databasetype = Database.TYPE_MYSQL;
-		init();
+		init(basePath);
 		Set<Class<?>> classesSet = UtilClass.getClasses(entitypackage);
 		Class<?>[] test = new Class<?>[classesSet.size()];
 		Class<?>[] carray = (Class<?>[]) classesSet.toArray(test);

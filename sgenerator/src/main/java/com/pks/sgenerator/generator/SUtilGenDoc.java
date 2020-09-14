@@ -1,11 +1,15 @@
 package com.pks.sgenerator.generator;
 
 import java.io.BufferedWriter;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -13,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
@@ -34,17 +39,61 @@ import com.pks.sgenerator.page.PageBuilder;
 
 
 public class SUtilGenDoc {
+	
+	private static List<String> field_base_type_list = new ArrayList<String>();
+	static{
+		field_base_type_list.add(String.class.getName());
+		field_base_type_list.add(Integer.class.getName());
+		field_base_type_list.add(Long.class.getName());
+		field_base_type_list.add(Date.class.getName());
+		field_base_type_list.add("String");
+		field_base_type_list.add("Integer");
+		field_base_type_list.add("Long");
+		field_base_type_list.add("Date");
+	}
 
+	
 	@SuppressWarnings("resource")
-	public static void init(){
-		ApplicationContext context = new FileSystemXmlApplicationContext(SUtilGenDoc.class.getResource("").getPath()+"gen_application.xml");
+	public static void init(String basePath){
+		DataOutputStream outputStream  = null;
+		InputStream inputStream = null;
+		try {
+			inputStream = SUtilGenDoc.class.getResourceAsStream("gen_application.xml");
+			outputStream = new DataOutputStream(new FileOutputStream(basePath + "gen_application.xml"));
+			int len = inputStream.available();
+			//判断长度是否大于1M
+			if (len <= 1024 * 1024) {
+				byte[] bytes = new byte[len];
+				inputStream.read(bytes);
+				outputStream.write(bytes);
+			} else {
+				int byteCount = 0;
+				//1M逐个读取
+				byte[] bytes = new byte[1024*1024];
+				while ((byteCount = inputStream.read(bytes)) != -1){
+					outputStream.write(bytes, 0, byteCount);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				outputStream.flush();
+				inputStream.close();
+				outputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		ApplicationContext context = new FileSystemXmlApplicationContext(basePath + "gen_application.xml");
 		if (context != null) {
 			freemarkerConfig = (MyFreeMarkerConfigurer) context.getBean("freemarkerConfig");
 		}
 	}
 	
-	public static void GenDocFile(String savepath,String actionpackage) throws IOException{
-		init();
+	public static void GenDocFile(String bastPath,String savepath,String actionpackage) throws IOException{
+		init(bastPath);
 		ClassLoader loader = ClassLoader.getSystemClassLoader();
 		Set<Class<?>> classesSet = UtilClass.getClasses(actionpackage);
 		Class<?>[] test = new Class<?>[classesSet.size()];
@@ -58,6 +107,9 @@ public class SUtilGenDoc {
 		}
 		BufferedWriter out = new BufferedWriter(new FileWriter(savepath + "文档.txt"));
 		try {
+			System.out.println("[TOC]");
+			out.write("[TOC]"); // \r\n即为换行
+			out.write("\r\n");
 			for (Class<?> c : array) {
 				url_first = "";
 				if (c.isAnnotationPresent(RequestMapping.class)) {
@@ -71,23 +123,23 @@ public class SUtilGenDoc {
 				for (Method method : methods) {
 					url_second = "";
 					postType = "POST/GET";
-					if(method.isAnnotationPresent(RequestMapping.class) && method.isAnnotationPresent(SApiMethod.class)){
+					if (method.isAnnotationPresent(RequestMapping.class) && method.isAnnotationPresent(SApiMethod.class)) {
 						RequestMapping mapping = method.getAnnotation(RequestMapping.class);
 						url_second = mapping.value()[0];
-						if(!url_second.startsWith("/")){
+						if (!url_second.startsWith("/")) {
 							url_second = "/" + url_second;
 						}
-						if(mapping.method().length > 0){
+						if (mapping.method().length > 0) {
 							StringBuffer sb = new StringBuffer();
 							for (RequestMethod rm : mapping.method()) {
-								if(StringUtils.isNotBlank(sb)){
+								if (StringUtils.isNotBlank(sb)) {
 									sb.append("/");
 								}
 								sb.append(rm);
 							}
 							postType = sb.toString();
 						}
-						if(method.isAnnotationPresent(SApiMethod.class)){
+						if (method.isAnnotationPresent(SApiMethod.class)) {
 							SApiMethod apiMethod = method.getAnnotation(SApiMethod.class);
 							System.out.println("- - - ");
 							out.write("- - - "); // \r\n即为换行
@@ -122,37 +174,36 @@ public class SUtilGenDoc {
 							System.out.println("```");
 							out.write("```");
 							out.write("\r\n");
-							System.out.println("**请求参数列表**");
-							out.write("**请求参数列表**");
-							out.write("\r\n");
-							System.out.println("");
-							out.write("");
-							out.write("\r\n");
-							System.out.println("|参数|必选|类型|说明|");
-							out.write("|参数|必选|类型|说明|");
-							out.write("\r\n");
-							System.out.println("| - | - | - | - |");
-							out.write("| - | - | - | - |");
-							out.write("\r\n");
+							
 							Map<String, List<Field>> obj_fields_map = new HashMap<String, List<Field>>();
 							SApiParam[] params = apiMethod.params();
+							if (params.length > 0 ) {
+								System.out.println("**请求参数列表**");
+								out.write("**请求参数列表**");
+								out.write("\r\n");
+								System.out.println("");
+								out.write("");
+								out.write("\r\n");
+								System.out.println("|参数|必选|类型|说明|");
+								out.write("|参数|必选|类型|说明|");
+								out.write("\r\n");
+								System.out.println("| - | - | - | - |");
+								out.write("| - | - | - | - |");
+								out.write("\r\n");
+							}
 							for (SApiParam param : params) {
 								String f_type = param.f_type();
-								Class clazz = null;
-								try {
-									clazz = loader.loadClass(param.f_type());
-								} catch (ClassNotFoundException e) {
-									e.printStackTrace();
-								}
-								if(f_type.equals(String.class.getName()) 
-										|| f_type.equals(Integer.class.getName()) 
-										|| f_type.equals(Long.class.getName())
-										|| f_type.equals(Date.class.getName())
-								){
+								if (field_base_type_list.contains(f_type)) {
 									System.out.println("|" + param.f_name() + "|" + param.required() + "|" + param.f_type() + "|" + param.v_name() + "|");
 									out.write("|" + param.f_name() + "|" + param.required() + "|" + param.f_type() + "|" + param.v_name() + "|");
 									out.write("\r\n");
-								}else{
+								} else {
+									Class clazz = null;
+									try {
+										clazz = loader.loadClass(param.f_type());
+									} catch (ClassNotFoundException e) {
+										e.printStackTrace();
+									}
 	//								System.out.println(clazz.getName());
 									List<Field> fields = CoderUtil.allField(clazz, true);
 									obj_fields_map.put(param.f_name(), fields);
@@ -161,9 +212,11 @@ public class SUtilGenDoc {
 									out.write("\r\n");
 								}
 							}
-							System.out.println("**附：对象属性**");
-							out.write("**附：对象属性**");
-							out.write("\r\n");
+							if (!obj_fields_map.isEmpty()) {
+								System.out.println("**附：对象属性**");
+								out.write("**附：对象属性**");
+								out.write("\r\n");
+							}
 							for (Iterator<Map.Entry<String, List<Field>>> it = obj_fields_map.entrySet().iterator(); it.hasNext();) {
 					            Map.Entry<String, List<Field>> entry = (Map.Entry<String, List<Field>>) it.next();
 					            System.out.println("");
@@ -183,10 +236,10 @@ public class SUtilGenDoc {
 								out.write("\r\n");
 					            List<Field> fields = entry.getValue();
 								for (Field field : fields) {
-									if(field.isAnnotationPresent(TableColumnType.class)){
+									if (field.isAnnotationPresent(TableColumnType.class)) {
 										TableColumnType tct = field.getAnnotation(TableColumnType.class);
 										String field_type = field.getGenericType().toString();
-										if(field_type.startsWith("class ")){
+										if (field_type.startsWith("class ")) {
 											field_type = field_type.substring("class ".length());
 										}
 										System.out.println("|" + field.getName() + "|" + tct.nullable() + "|" + field_type + "|" + tct.comment() + "|");
@@ -197,17 +250,19 @@ public class SUtilGenDoc {
 							}
 						}
 	
-						System.out.println("");
-						out.write("");
-						out.write("\r\n");
-						System.out.println("**返回格式**");
-						out.write("**返回格式**");
-						out.write("\r\n");
-						System.out.println("");
-						out.write("");
-						out.write("\r\n");
 						
-						if(method.isAnnotationPresent(SApiReturn.class)){
+						if (method.isAnnotationPresent(SApiReturn.class)) {
+							
+							System.out.println("");
+							out.write("");
+							out.write("\r\n");
+							System.out.println("**返回格式**");
+							out.write("**返回格式**");
+							out.write("\r\n");
+							System.out.println("");
+							out.write("");
+							out.write("\r\n");
+							
 							SApiReturn apiReturn = method.getAnnotation(SApiReturn.class);
 							System.out.println("|参数|类型|说明|");
 							out.write("|参数|类型|说明|");
@@ -219,29 +274,27 @@ public class SUtilGenDoc {
 							Map<String, List<Field>> obj_fields_map = new HashMap<String, List<Field>>();
 							for (SApiParam param : params) {
 								String f_type = param.f_type();
-								Class clazz = null;
-								try {
-									clazz = loader.loadClass(param.f_type());
-								} catch (ClassNotFoundException e) {
-									e.printStackTrace();
-								}
-								if(f_type.equals(String.class.getName()) 
-										|| f_type.equals(Integer.class.getName()) 
-										|| f_type.equals(Long.class.getName())
-										|| f_type.equals(Date.class.getName())
-								){
+								if (field_base_type_list.contains(f_type)) {
 									System.out.println("|" + param.f_name() + "|" + param.f_type() + "|" + param.v_name() + "|");
 									out.write("|" + param.f_name() + "|" + param.f_type() + "|" + param.v_name() + "|");
 									out.write("\r\n");
-								}else{
+								} else {
+									Class clazz = null;
+									try {
+										clazz = loader.loadClass(param.f_type());
+									} catch (ClassNotFoundException e) {
+										e.printStackTrace();
+									}
 									List<Field> fields = CoderUtil.allField(clazz, true);
 									obj_fields_map.put(param.f_name(), fields);
 									
 								}
 							}
-							System.out.println("**附：对象属性**");
-							out.write("**附：对象属性**");
-							out.write("\r\n");
+							if (!obj_fields_map.isEmpty()) {
+								System.out.println("**附：对象属性**");
+								out.write("**附：对象属性**");
+								out.write("\r\n");
+							}
 							for (Iterator<Map.Entry<String, List<Field>>> it = obj_fields_map.entrySet().iterator(); it.hasNext();) {
 					            Map.Entry<String, List<Field>> entry = (Map.Entry<String, List<Field>>) it.next();
 					            System.out.println("");
@@ -261,10 +314,10 @@ public class SUtilGenDoc {
 								out.write("\r\n");
 								List<Field> fields = entry.getValue();
 								for (Field field : fields) {
-									if(field.isAnnotationPresent(TableColumnType.class)){
+									if (field.isAnnotationPresent(TableColumnType.class)) {
 										TableColumnType tct = field.getAnnotation(TableColumnType.class);
 										String field_type = field.getGenericType().toString();
-										if(field_type.startsWith("class ")){
+										if (field_type.startsWith("class ")) {
 											field_type = field_type.substring("class ".length());
 										}
 										System.out.println("|" + field.getName() + "|" + field_type + "|" + tct.comment() + "|");
@@ -285,113 +338,8 @@ public class SUtilGenDoc {
 		}
 	}
 	
-	public static void GenFile(String savepath,String databasetype,String entitypackage){
-		init();
-		Set<Class<?>> classesSet = UtilClass.getClasses(entitypackage);
-		Class<?>[] test = new Class<?>[classesSet.size()];
-		Class<?>[] carray = (Class<?>[]) classesSet.toArray(test);
-		allJavaAndFtl(savepath,databasetype,carray,null);
-		allTable(savepath,databasetype,carray,null);
-		System.out.println("文件生成结束！");
-	}
-	
-	public static void GenMySqlFile(String savepath,String entitypackage){
-		String databasetype = Database.TYPE_MYSQL;
-		init();
-		Set<Class<?>> classesSet = UtilClass.getClasses(entitypackage);
-		Class<?>[] test = new Class<?>[classesSet.size()];
-		Class<?>[] carray = (Class<?>[]) classesSet.toArray(test);
-		allJavaAndFtl(savepath,databasetype,carray,null);
-		allTable(savepath,databasetype,carray,null);
-		System.out.println("文件生成结束！");
-	}
-	
-	public static void GenMySqlFile(String savepath,String entitypackage,String prefix){
-		String databasetype = Database.TYPE_MYSQL;
-		init();
-		Set<Class<?>> classesSet = UtilClass.getClasses(entitypackage);
-		Class<?>[] test = new Class<?>[classesSet.size()];
-		Class<?>[] carray = (Class<?>[]) classesSet.toArray(test);
-		allJavaAndFtl(savepath,databasetype,carray,prefix);
-		allTable(savepath,databasetype,carray,prefix);
-		System.out.println("文件生成结束！");
-	}
 	
 	public static FreeMarkerConfigurer freemarkerConfig = null;
 
-	private static void allTable(String savepath,String databasetype,Class<?>[] carray,String prefix) {
-		Database database = DatabaseBuilder.initDatabase(carray, databasetype,prefix);
-		Map<String, Object> root = new HashMap<String, Object>();
-		root.put("tables", database.getTables());
-		root.put("databasename", database.getName());
-		if (Database.TYPE_MYSQL.equals(databasetype)) {
-			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root,SUtilGenDoc.class.getResource("").getPath()+"DatabaseMySQL.ftl", savepath + "init.sql");
-		} else if (Database.TYPE_SQLSERVER.equals(databasetype)) {
-			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, SUtilGenDoc.class.getResource("").getPath()+"DatabaseSqlServer.ftl", savepath + "init.sql");
-		} else if (Database.TYPE_ORACLE.equals(databasetype)) {
-			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, SUtilGenDoc.class.getResource("").getPath()+"DatabaseOracle.ftl", savepath + "init.sql");
-		}
-	}
-
-	private static void allJavaAndFtl(String savepath,String databasetype, Class<?>[] carray,String prefix) {
-		for (Class<?> c : carray) {
-			allJava(savepath,databasetype,c,prefix);
-			allFtl(savepath,c);
-		}
-	}
-
-	private static void allFtl(String savepath,Class<?> className) {
-		PageBean obj = PageBuilder.initPage(className);
-		if (obj != null) {
-			Map<String, Object> root = new HashMap<String, Object>();
-			root.put("obj", obj);
-			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(
-					root,
-					SUtilGenDoc.class.getResource("").getPath()+"Page_xx_list.ftl",
-					savepath + "/WEB-INF/ftl/admin/" + obj.getModuleName().toLowerCase() + "/" + obj.getClassName().toLowerCase()
-							+ "_list.ftl");
-			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(
-					root,
-					SUtilGenDoc.class.getResource("").getPath()+"Page_xx_modify2.ftl",
-					savepath + "/WEB-INF/ftl/admin/" + obj.getModuleName().toLowerCase() + "/" + obj.getClassName().toLowerCase()
-							+ "_modify.ftl");
-		}
-	}
-
-	private static void allJava(String savepath, String databasetype, Class<?> className,String prefix) {
-
-		JavaCode code = JavaCodeBuilder.initJavaCode(className,prefix);
-
-		Map<String, Object> root = new HashMap<String, Object>();
-		if (code != null) {
-			root.put("packages", code.getPackageName());
-			root.put("modules", code.getModuleName());
-			root.put("classes", code.getClassName());
-			root.put("tables", code.getTableName());
-			root.put("fields", code.getFieldList());
-			root.put("qbuilderList", code.getQbuilderList());
-			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, SUtilGenDoc.class.getResource("").getPath()+"XxMapperJava.ftl",
-					savepath + code.getPackageName() + "/mapper/" + code.getModuleName() + "/" + code.getClassName() + "Mapper.java");
-			if (Database.TYPE_MYSQL.equals(databasetype)) {
-				FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, SUtilGenDoc.class.getResource("").getPath()+"XxMapperXmlMySQL.ftl",
-						savepath + code.getPackageName() + "/mapper/" + code.getModuleName() + "/" + code.getClassName() + "Mapper.xml");
-			} else if (Database.TYPE_SQLSERVER.equals(databasetype)) {
-				FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, SUtilGenDoc.class.getResource("").getPath()+"XxMapperXmlSqlServer.ftl",
-						savepath + code.getPackageName() + "/mapper/" + code.getModuleName() + "/" + code.getClassName() + "Mapper.xml");
-			} else if (Database.TYPE_ORACLE.equals(databasetype)) {
-				FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, SUtilGenDoc.class.getResource("").getPath()+"XxMapperXmlOracle.ftl",
-						savepath + code.getPackageName() + "/mapper/" + code.getModuleName() + "/" + code.getClassName() + "Mapper.xml");
-			}
-			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, SUtilGenDoc.class.getResource("").getPath()+"XxService.ftl",
-					savepath + code.getPackageName() + "/service/" + code.getModuleName() + "/" + code.getClassName() + "Service.java");
-			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, SUtilGenDoc.class.getResource("").getPath()+"XxServiceImpl.ftl",
-					savepath + code.getPackageName() + "/service/" + code.getModuleName() + "/" + code.getClassName() + "ServiceImpl.java");
-			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, SUtilGenDoc.class.getResource("").getPath()+"XxAction2.ftl",
-					savepath + code.getPackageName() + "/action/" + code.getModuleName() + "/" + code.getClassName() + "Action.java");
-		} else {
-			System.out.println("生成 " + className.getName() + " 失败");
-		}
-
-	}
 
 }
