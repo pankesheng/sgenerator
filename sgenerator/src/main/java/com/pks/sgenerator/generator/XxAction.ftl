@@ -36,7 +36,7 @@ public class ${classes}Action extends BasicAction {
 	@RequestMapping("/tolist")
 	public String tolist(Model model) {
 
-		return "/WEB-INF/ftl/admin/${modules?lower_case}/${classes?lower_case}_list.ftl";
+		return "/WEB-INF/ftl/admin/${modules?lower_case}/${classes?lower_case}_list";
 	}
 
 	@RequestMapping("/list")
@@ -81,7 +81,7 @@ public class ${classes}Action extends BasicAction {
 
 	@RequestMapping("/toadd")
 	public String toadd(Model model) {
-		return "/WEB-INF/ftl/admin/${modules?lower_case}/${classes?lower_case}_modify.ftl";
+		return "/WEB-INF/ftl/admin/${modules?lower_case}/${classes?lower_case}_modify";
 	}
 
 	@RequestMapping("/tomodify")
@@ -91,7 +91,7 @@ public class ${classes}Action extends BasicAction {
 			obj = ${classes?uncap_first}Service.findById(id);
 		}
 		model.addAttribute("obj", obj);
-		return "/WEB-INF/ftl/admin/${modules?lower_case}/${classes?lower_case}_modify.ftl";
+		return "/WEB-INF/ftl/admin/${modules?lower_case}/${classes?lower_case}_modify";
 	}
 
 	@RequestMapping("/delete")

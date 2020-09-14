@@ -1,10 +1,9 @@
 package com.pks.sgenerator.generator;
 
-import java.io.DataOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,40 +21,39 @@ import com.pks.sgenerator.page.PageBuilder;
 
 public class SGenUtil {
 
-	@SuppressWarnings("resource")
-	public static void init(String basePath){
-		DataOutputStream outputStream  = null;
-		InputStream inputStream = null;
-		try {
-			inputStream = SUtilGenDoc.class.getResourceAsStream("gen_application.xml");
-			outputStream = new DataOutputStream(new FileOutputStream(basePath + "gen_application.xml"));
-			int len = inputStream.available();
-			//判断长度是否大于1M
-			if (len <= 1024 * 1024) {
-				byte[] bytes = new byte[len];
-				inputStream.read(bytes);
-				outputStream.write(bytes);
-			} else {
-				int byteCount = 0;
-				//1M逐个读取
-				byte[] bytes = new byte[1024*1024];
-				while ((byteCount = inputStream.read(bytes)) != -1){
-					outputStream.write(bytes, 0, byteCount);
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				outputStream.flush();
-				inputStream.close();
-				outputStream.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+	private static String resourceFilePath ; 
+	
+	public static List<String> resourceFileList = new ArrayList<String>();
+	static{
+		resourceFileList.add("DatabaseMySQL.ftl");
+		resourceFileList.add("DatabaseOracle.ftl");
+		resourceFileList.add("DatabaseSqlServer.ftl");
+		resourceFileList.add("XxAction2.ftl");
+		resourceFileList.add("XxMapperJava.ftl");
+		resourceFileList.add("XxMapperXmlMySQL.ftl");
+		resourceFileList.add("XxMapperXmlOracle.ftl");
+		resourceFileList.add("XxMapperXmlSqlServer.ftl");
+		resourceFileList.add("XxService.ftl");
+		resourceFileList.add("XxServiceImpl.ftl");
+	}
+ 	public static void initSourceFile(String basePath){
+ 		if (!basePath.endsWith("/")) {
+ 			basePath = basePath + "/";
+ 		}
+ 		resourceFilePath = basePath + "resourceFile/" ;
+ 		File file = new File(resourceFilePath);
+ 		if (!file.exists()) {
+ 			file.mkdirs();
+ 		}
+		SUtilsSource.genSourceFile("gen_application.xml", resourceFilePath);
+		for (String resourceName: resourceFileList) {
+			SUtilsSource.genSourceFile(resourceName, resourceFilePath);
 		}
-		
-		ApplicationContext context = new FileSystemXmlApplicationContext(basePath + "gen_application.xml");
+	}
+	
+	@SuppressWarnings("resource")
+	public static void init(){
+		ApplicationContext context = new FileSystemXmlApplicationContext(resourceFilePath + "gen_application.xml");
 		if (context != null) {
 			freemarkerConfig = (MyFreeMarkerConfigurer) context.getBean("freemarkerConfig");
 		}
@@ -66,7 +64,8 @@ public class SGenUtil {
 	}
 	
 	public static void GenFile(String basePath,String savepath,String databasetype,String entitypackage){
-		init(basePath);
+		initSourceFile(basePath);
+		init();
 		Set<Class<?>> classesSet = UtilClass.getClasses(entitypackage);
 		Class<?>[] test = new Class<?>[classesSet.size()];
 		Class<?>[] carray = (Class<?>[]) classesSet.toArray(test);
@@ -77,7 +76,8 @@ public class SGenUtil {
 	
 	public static void GenMySqlFile(String basePath,String savepath,String entitypackage){
 		String databasetype = Database.TYPE_MYSQL;
-		init(basePath);
+		initSourceFile(basePath);
+		init();
 		Set<Class<?>> classesSet = UtilClass.getClasses(entitypackage);
 		Class<?>[] test = new Class<?>[classesSet.size()];
 		Class<?>[] carray = (Class<?>[]) classesSet.toArray(test);
@@ -88,7 +88,8 @@ public class SGenUtil {
 	
 	public static void GenMySqlFile(String basePath,String savepath,String entitypackage,String prefix){
 		String databasetype = Database.TYPE_MYSQL;
-		init(basePath);
+		initSourceFile(basePath);
+		init();
 		Set<Class<?>> classesSet = UtilClass.getClasses(entitypackage);
 		Class<?>[] test = new Class<?>[classesSet.size()];
 		Class<?>[] carray = (Class<?>[]) classesSet.toArray(test);
@@ -105,18 +106,18 @@ public class SGenUtil {
 		root.put("tables", database.getTables());
 		root.put("databasename", database.getName());
 		if (Database.TYPE_MYSQL.equals(databasetype)) {
-			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root,SGenUtil.class.getResource("").getPath()+"DatabaseMySQL.ftl", savepath + "init.sql");
+			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root,resourceFilePath+"DatabaseMySQL.ftl", savepath + "init.sql");
 		} else if (Database.TYPE_SQLSERVER.equals(databasetype)) {
-			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, SGenUtil.class.getResource("").getPath()+"DatabaseSqlServer.ftl", savepath + "init.sql");
+			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, resourceFilePath+"DatabaseSqlServer.ftl", savepath + "init.sql");
 		} else if (Database.TYPE_ORACLE.equals(databasetype)) {
-			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, SGenUtil.class.getResource("").getPath()+"DatabaseOracle.ftl", savepath + "init.sql");
+			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, resourceFilePath+"DatabaseOracle.ftl", savepath + "init.sql");
 		}
 	}
 
 	private static void allJavaAndFtl(String savepath,String databasetype, Class<?>[] carray,String prefix) {
 		for (Class<?> c : carray) {
 			allJava(savepath,databasetype,c,prefix);
-			allFtl(savepath,c);
+//			allFtl(savepath,c);
 		}
 	}
 
@@ -125,16 +126,10 @@ public class SGenUtil {
 		if (obj != null) {
 			Map<String, Object> root = new HashMap<String, Object>();
 			root.put("obj", obj);
-			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(
-					root,
-					SGenUtil.class.getResource("").getPath()+"Page_xx_list.ftl",
-					savepath + "/WEB-INF/ftl/admin/" + obj.getModuleName().toLowerCase() + "/" + obj.getClassName().toLowerCase()
-							+ "_list.ftl");
-			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(
-					root,
-					SGenUtil.class.getResource("").getPath()+"Page_xx_modify2.ftl",
-					savepath + "/WEB-INF/ftl/admin/" + obj.getModuleName().toLowerCase() + "/" + obj.getClassName().toLowerCase()
-							+ "_modify.ftl");
+			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile( root, resourceFilePath+"Page_xx_list.ftl",
+					savepath + "/WEB-INF/ftl/admin/" + obj.getModuleName().toLowerCase() + "/" + obj.getClassName().toLowerCase() + "_list.ftl");
+			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, resourceFilePath+"Page_xx_modify2.ftl",	
+					savepath + "/WEB-INF/ftl/admin/" + obj.getModuleName().toLowerCase() + "/" + obj.getClassName().toLowerCase() + "_modify.ftl");
 		}
 	}
 
@@ -150,23 +145,23 @@ public class SGenUtil {
 			root.put("tables", code.getTableName());
 			root.put("fields", code.getFieldList());
 			root.put("qbuilderList", code.getQbuilderList());
-			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, SGenUtil.class.getResource("").getPath()+"XxMapperJava.ftl",
+			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, resourceFilePath+"XxMapperJava.ftl",
 					savepath + code.getPackageName() + "/mapper/" + code.getModuleName() + "/" + code.getClassName() + "Mapper.java");
 			if (Database.TYPE_MYSQL.equals(databasetype)) {
-				FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, SGenUtil.class.getResource("").getPath()+"XxMapperXmlMySQL.ftl",
+				FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, resourceFilePath+"XxMapperXmlMySQL.ftl",
 						savepath + code.getPackageName() + "/mapper/" + code.getModuleName() + "/" + code.getClassName() + "Mapper.xml");
 			} else if (Database.TYPE_SQLSERVER.equals(databasetype)) {
-				FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, SGenUtil.class.getResource("").getPath()+"XxMapperXmlSqlServer.ftl",
+				FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, resourceFilePath+"XxMapperXmlSqlServer.ftl",
 						savepath + code.getPackageName() + "/mapper/" + code.getModuleName() + "/" + code.getClassName() + "Mapper.xml");
 			} else if (Database.TYPE_ORACLE.equals(databasetype)) {
-				FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, SGenUtil.class.getResource("").getPath()+"XxMapperXmlOracle.ftl",
+				FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, resourceFilePath+"XxMapperXmlOracle.ftl",
 						savepath + code.getPackageName() + "/mapper/" + code.getModuleName() + "/" + code.getClassName() + "Mapper.xml");
 			}
-			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, SGenUtil.class.getResource("").getPath()+"XxService.ftl",
+			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, resourceFilePath+"XxService.ftl",
 					savepath + code.getPackageName() + "/service/" + code.getModuleName() + "/" + code.getClassName() + "Service.java");
-			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, SGenUtil.class.getResource("").getPath()+"XxServiceImpl.ftl",
+			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, resourceFilePath+"XxServiceImpl.ftl",
 					savepath + code.getPackageName() + "/service/" + code.getModuleName() + "/" + code.getClassName() + "ServiceImpl.java");
-			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, SGenUtil.class.getResource("").getPath()+"XxAction2.ftl",
+			FreemarkerUtil.getInstance(freemarkerConfig).htmlFile(root, resourceFilePath+"XxAction2.ftl",
 					savepath + code.getPackageName() + "/action/" + code.getModuleName() + "/" + code.getClassName() + "Action.java");
 		} else {
 			System.out.println("生成 " + className.getName() + " 失败");

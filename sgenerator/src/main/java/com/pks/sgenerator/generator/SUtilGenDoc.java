@@ -40,6 +40,7 @@ import com.pks.sgenerator.page.PageBuilder;
 
 public class SUtilGenDoc {
 	
+	private static String resourceFilePath ; 
 	private static List<String> field_base_type_list = new ArrayList<String>();
 	static{
 		field_base_type_list.add(String.class.getName());
@@ -52,48 +53,30 @@ public class SUtilGenDoc {
 		field_base_type_list.add("Date");
 	}
 
+	public static void initSourceFile(String basePath){
+ 		if (!basePath.endsWith("/")) {
+ 			basePath = basePath + "/";
+ 		}
+ 		resourceFilePath = basePath + "resourceFile/" ;
+ 		File file = new File(resourceFilePath);
+ 		if (!file.exists()) {
+ 			file.mkdirs();
+ 		}
+		SUtilsSource.genSourceFile("gen_application.xml", resourceFilePath);
+	}
 	
 	@SuppressWarnings("resource")
-	public static void init(String basePath){
-		DataOutputStream outputStream  = null;
-		InputStream inputStream = null;
-		try {
-			inputStream = SUtilGenDoc.class.getResourceAsStream("gen_application.xml");
-			outputStream = new DataOutputStream(new FileOutputStream(basePath + "gen_application.xml"));
-			int len = inputStream.available();
-			//判断长度是否大于1M
-			if (len <= 1024 * 1024) {
-				byte[] bytes = new byte[len];
-				inputStream.read(bytes);
-				outputStream.write(bytes);
-			} else {
-				int byteCount = 0;
-				//1M逐个读取
-				byte[] bytes = new byte[1024*1024];
-				while ((byteCount = inputStream.read(bytes)) != -1){
-					outputStream.write(bytes, 0, byteCount);
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				outputStream.flush();
-				inputStream.close();
-				outputStream.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		ApplicationContext context = new FileSystemXmlApplicationContext(basePath + "gen_application.xml");
+	public static void init(){
+		SUtilsSource.genSourceFile("gen_application.xml", resourceFilePath);
+		ApplicationContext context = new FileSystemXmlApplicationContext(resourceFilePath + "gen_application.xml");
 		if (context != null) {
 			freemarkerConfig = (MyFreeMarkerConfigurer) context.getBean("freemarkerConfig");
 		}
 	}
 	
-	public static void GenDocFile(String bastPath,String savepath,String actionpackage) throws IOException{
-		init(bastPath);
+	public static void GenDocFile(String basePath,String savepath,String actionpackage) throws IOException{
+//		initSourceFile(basePath);
+//		init();
 		ClassLoader loader = ClassLoader.getSystemClassLoader();
 		Set<Class<?>> classesSet = UtilClass.getClasses(actionpackage);
 		Class<?>[] test = new Class<?>[classesSet.size()];
