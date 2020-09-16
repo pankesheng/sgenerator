@@ -177,8 +177,8 @@ public class SUtilGenDoc {
 							for (SApiParam param : params) {
 								String f_type = param.f_type();
 								if (field_base_type_list.contains(f_type)) {
-									System.out.println("|" + param.f_name() + "|" + param.required() + "|" + param.f_type() + "|" + param.v_name() + "|");
-									out.write("|" + param.f_name() + "|" + param.required() + "|" + param.f_type() + "|" + param.v_name() + "|");
+									System.out.println("|" + param.f_name() + "|" + param.required() + "|" + param.f_type() + "|" + param.v_name() + (StringUtils.isNotBlank(param.defaultValue())?("<br />默认值：" + param.defaultValue()):"") + "|");
+									out.write("|" + param.f_name() + "|" + param.required() + "|" + param.f_type() + "|" + param.v_name() + (StringUtils.isNotBlank(param.defaultValue())?("<br />默认值：" + param.defaultValue()):"") + "|");
 									out.write("\r\n");
 								} else {
 									Class clazz = null;
@@ -225,8 +225,8 @@ public class SUtilGenDoc {
 										if (field_type.startsWith("class ")) {
 											field_type = field_type.substring("class ".length());
 										}
-										System.out.println("|" + field.getName() + "|" + tct.nullable() + "|" + field_type + "|" + tct.comment() + "|");
-										out.write("|" + field.getName() + "|" + tct.nullable() + "|" + field_type + "|" + tct.comment() + "|");
+										System.out.println("|" + field.getName() + "|" + tct.nullable() + "|" + field_type + "|" + tct.comment() + (StringUtils.isNotBlank(tct.defaultValue())?("<br />默认值：" + tct.defaultValue()):"") + "|");
+										out.write("|" + field.getName() + "|" + tct.nullable() + "|" + field_type + "|" + tct.comment() + (StringUtils.isNotBlank(tct.defaultValue())?("<br />默认值：" + tct.defaultValue()):"") + "|");
 										out.write("\r\n");
 									}
 								}
@@ -258,8 +258,8 @@ public class SUtilGenDoc {
 							for (SApiParam param : params) {
 								String f_type = param.f_type();
 								if (field_base_type_list.contains(f_type)) {
-									System.out.println("|" + param.f_name() + "|" + param.f_type() + "|" + param.v_name() + "|");
-									out.write("|" + param.f_name() + "|" + param.f_type() + "|" + param.v_name() + "|");
+									System.out.println("|" + param.f_name() + "|" + param.f_type() + "|" + param.v_name() + (StringUtils.isNotBlank(param.defaultValue())?("<br />默认值：" + param.defaultValue()):"") + "|");
+									out.write("|" + param.f_name() + "|" + param.f_type() + "|" + param.v_name() + (StringUtils.isNotBlank(param.defaultValue())?("<br />默认值：" + param.defaultValue()):"") + "|");
 									out.write("\r\n");
 								} else {
 									Class clazz = null;
@@ -303,8 +303,8 @@ public class SUtilGenDoc {
 										if (field_type.startsWith("class ")) {
 											field_type = field_type.substring("class ".length());
 										}
-										System.out.println("|" + field.getName() + "|" + field_type + "|" + tct.comment() + "|");
-										out.write("|" + field.getName() + "|" + field_type + "|" + tct.comment() + "|");
+										System.out.println("|" + field.getName() + "|" + field_type + "|" + tct.comment() + (StringUtils.isNotBlank(tct.defaultValue())?("<br />默认值：" + tct.defaultValue()):"") + "|");
+										out.write("|" + field.getName() + "|" + field_type + "|" + tct.comment() + (StringUtils.isNotBlank(tct.defaultValue())?("<br />默认值：" + tct.defaultValue()):"") + "|");
 										out.write("\r\n");
 									}
 								}
