@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SApiReturn {
 	
-	/**接口参数列表*/
+	/**接口返回值列表*/
 	SApiParam[] params();
 	
 }
