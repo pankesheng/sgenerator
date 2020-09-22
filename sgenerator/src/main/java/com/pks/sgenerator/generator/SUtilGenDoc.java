@@ -1,12 +1,9 @@
 package com.pks.sgenerator.generator;
 
 import java.io.BufferedWriter;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -17,30 +14,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.FileSystemXmlApplicationContext;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import com.pks.sgenerator.coder.CoderUtil;
-import com.pks.sgenerator.database.Database;
-import com.pks.sgenerator.database.DatabaseBuilder;
 import com.pks.sgenerator.database.SApiMethod;
 import com.pks.sgenerator.database.SApiParam;
 import com.pks.sgenerator.database.SApiReturn;
 import com.pks.sgenerator.database.TableColumnType;
-import com.pks.sgenerator.java.JavaCode;
-import com.pks.sgenerator.java.JavaCodeBuilder;
-import com.pks.sgenerator.page.PageBean;
-import com.pks.sgenerator.page.PageBuilder;
 
 
 public class SUtilGenDoc {
 	
-	private static String resourceFilePath ; 
 	private static List<String> field_base_type_list = new ArrayList<String>();
 	static{
 		field_base_type_list.add(String.class.getName());
@@ -53,30 +40,17 @@ public class SUtilGenDoc {
 		field_base_type_list.add("Date");
 	}
 
-	public static void initSourceFile(String basePath){
- 		if (!basePath.endsWith("/")) {
- 			basePath = basePath + "/";
- 		}
- 		resourceFilePath = basePath + "resourceFile/" ;
- 		File file = new File(resourceFilePath);
- 		if (!file.exists()) {
- 			file.mkdirs();
- 		}
-		SUtilsSource.genSourceFile("gen_application.xml", resourceFilePath);
-	}
-	
-	@SuppressWarnings("resource")
-	public static void init(){
-		SUtilsSource.genSourceFile("gen_application.xml", resourceFilePath);
-		ApplicationContext context = new FileSystemXmlApplicationContext(resourceFilePath + "gen_application.xml");
-		if (context != null) {
-			freemarkerConfig = (MyFreeMarkerConfigurer) context.getBean("freemarkerConfig");
-		}
-	}
-	
-	public static void GenDocFile(String basePath,String savepath,String actionpackage) throws IOException{
-//		initSourceFile(basePath);
-//		init();
+	/**
+	 * 生成markdown语法格式的接口文档
+	 * 需要在对应的接口加上注解 SApiMethod(接口名称注解-必须) SApiReturn(返回值注解) 两者内均可加上SApiParams(参数说明注解)
+	 * @param savepath markdown文档内容生成目录
+	 * @param actionpackage action/controller 层目录路径，例如 com.xxx.xxx.action 
+	 * @throws IOException
+	 * @author pks
+	 * @date 2020年9月22日
+	 */
+	@SuppressWarnings("rawtypes")
+	public static void genDocFile(String savepath,String actionpackage) throws IOException{
 		ClassLoader loader = ClassLoader.getSystemClassLoader();
 		Set<Class<?>> classesSet = UtilClass.getClasses(actionpackage);
 		Class<?>[] test = new Class<?>[classesSet.size()];

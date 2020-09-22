@@ -19,7 +19,7 @@ import com.pks.sgenerator.page.PageBean;
 import com.pks.sgenerator.page.PageBuilder;
 
 
-public class SGenUtil {
+public class SUtilGenClass {
 
 	private static String resourceFilePath ; 
 	
@@ -63,7 +63,16 @@ public class SGenUtil {
 //		}
 	}
 	
-	public static void GenFile(String basePath,String savepath,String databasetype,String entitypackage){
+	/**
+	 * 根据不同数据源类型生成对应的sql初始化语句，mapper，service，action层代码
+	 * @param basePath 生成文件目录主文件夹 ，通过步骤会自动生成一些模板文件ftl，如果需要可以修改里面部分内容再进行重新代码生成
+	 * @param savepath sql文件、代码文件 生成目录
+	 * @param databasetype 数据库类型 使用com.pks.sgenerator.database.Database中的常量类定义
+	 * @param entitypackage 实体类存放目录    如：com.xxx.xx.entity
+	 * @author pks
+	 * @date 2020年9月22日
+	 */
+	public static void genFile(String basePath,String savepath,String databasetype,String entitypackage){
 		initSourceFile(basePath);
 		init();
 		Set<Class<?>> classesSet = UtilClass.getClasses(entitypackage);
@@ -74,7 +83,15 @@ public class SGenUtil {
 		System.out.println("文件生成结束！");
 	}
 	
-	public static void GenMySqlFile(String basePath,String savepath,String entitypackage){
+	/**
+	 * 指定数据源类型为MYSQL，生成对应的sql初始化语句，mapper，service，action层代码
+	 * @param basePath 生成文件目录主文件夹 ，通过步骤会自动生成一些模板文件ftl，如果需要可以修改里面部分内容再进行重新代码生成
+	 * @param savepath sql文件、代码文件 生成目录
+	 * @param entitypackage 实体类存放目录    如：com.xxx.xx.entity
+	 * @author pks
+	 * @date 2020年9月22日
+	 */
+	public static void genMySqlFile(String basePath,String savepath,String entitypackage){
 		String databasetype = Database.TYPE_MYSQL;
 		initSourceFile(basePath);
 		init();
@@ -86,7 +103,16 @@ public class SGenUtil {
 		System.out.println("文件生成结束！");
 	}
 	
-	public static void GenMySqlFile(String basePath,String savepath,String entitypackage,String prefix){
+	/**
+	 * 指定数据源类型为MYSQL，生成对应的sql初始化语句，mapper，service，action层代码
+	 * @param basePath 生成文件目录主文件夹 ，通过步骤会自动生成一些模板文件ftl，如果需要可以修改里面部分内容再进行重新代码生成
+	 * @param savepath sql文件、代码文件 生成目录
+	 * @param entitypackage 实体类存放目录    如：com.xxx.xx.entity
+	 * @param prefix 初始化sql语句中的表名会以 t_prefix_xxx 的格式：如 User 类，prefix = "aaa" ,生成后为  t_aaa_user
+	 * @author pks
+	 * @date 2020年9月22日
+	 */
+	public static void genMySqlFile(String basePath,String savepath,String entitypackage,String prefix){
 		String databasetype = Database.TYPE_MYSQL;
 		initSourceFile(basePath);
 		init();
